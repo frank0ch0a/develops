@@ -9,6 +9,7 @@
 #import "SearchViewController.h"
 #import "SearchResult.h"
 #import "SearchResultCell.h"
+#import "AFJSONRequestOperation.h"
 
 static NSString *const SearchResultCellIdentifier=@"SearchResultCell";
 static NSString *const NothingFoundCellIdentifier=@"NothingFoundCell";
@@ -19,6 +20,7 @@ static NSString *const LoadingCellIdentifier=@"LoadingCell";
 @property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedControl;
 
 @end
 
@@ -27,10 +29,22 @@ static NSString *const LoadingCellIdentifier=@"LoadingCell";
     
     NSMutableArray *searchResults;
     BOOL isLoading;
+    NSOperationQueue *queue;
     
 }
 @synthesize searchBar=_searchBar;
 @synthesize tableView=_tableView;
+@synthesize segmentedControl=_segmentedControl;
+
+
+-(id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil{
+    
+    if ((self=[super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
+        queue=[[NSOperationQueue alloc]init];
+    }
+    
+    return self;
+}
 
 - (void)viewDidLoad
 {
@@ -295,7 +309,7 @@ static NSString *const LoadingCellIdentifier=@"LoadingCell";
         SearchResult *searchResult;
         
         NSString *wrapperType=[resultDict objectForKey:@"wrapperType"];
-        //NSString *kind=[resultDict objectForKey:@"kind"];
+        NSString *kind=[resultDict objectForKey:@"kind"];
         
         
         if ([wrapperType isEqualToString:@"track"]){
@@ -311,7 +325,7 @@ static NSString *const LoadingCellIdentifier=@"LoadingCell";
             searchResult=[self parseSoftware:resultDict];
             
             
-        }else if ([wrapperType isEqualToString:@"ebook"]){
+        }else if ([kind isEqualToString:@"ebook"]){
             
             searchResult=[self parseEbook:resultDict];
             
@@ -328,6 +342,7 @@ static NSString *const LoadingCellIdentifier=@"LoadingCell";
     
     
 }
+/*
 -(NSDictionary *)parseJSON:(NSString *)jsonString
 {
     NSData *data=[jsonString dataUsingEncoding:NSUTF8StringEncoding];
@@ -354,10 +369,11 @@ static NSString *const LoadingCellIdentifier=@"LoadingCell";
     
     
     
-}
+}*/
 
 #pragma mark -searchBarDelegate
 
+/*
 -(NSString *)performStoreRequestWithURL:(NSURL *)url
 {
     NSError *error;
@@ -369,84 +385,100 @@ static NSString *const LoadingCellIdentifier=@"LoadingCell";
     
     return resultString;
     
-}
+}*/
 
--(void)searchBarSearchButtonClicked:(UISearchBar *)searchBar{
+-(void)perfomSearch
+{
     
-    if ([searchBar.text length]>0) {
+    
+    if ([self.searchBar.text length]>0) {
         
-    
-    
-     [searchBar resignFirstResponder];
+        
+        
+        [self.searchBar resignFirstResponder];
+        
+        [queue cancelAllOperations];
         
         isLoading=YES;
         
         [self.tableView reloadData];
-    
-    searchResults=[NSMutableArray arrayWithCapacity:10];
-    
- 
-    
-        dispatch_queue_t queue=dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         
-        dispatch_async(queue, ^{
+        searchResults=[NSMutableArray arrayWithCapacity:10];
+        
+        NSURL *url=[self urlWithSearchText:self.searchBar.text category:self.segmentedControl.selectedSegmentIndex];
+        
+        NSURLRequest *request=[NSURLRequest requestWithURL:url];
+        
+        
+        AFJSONRequestOperation *operation=[AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+            NSLog(@"Success!");
             
-            NSURL *url=[self urlWithSearchText:searchBar.text];
-            NSString *jsonString=[self performStoreRequestWithURL:url];
-            
-            if (jsonString==nil) {
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self showNetworkError];
-                });
-                
-                NSLog(@"Error!");
-                return ;
-            }
-            
-            NSDictionary *dictionary=[self parseJSON:jsonString];
-            
-            if (dictionary==nil) {
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self showNetworkError];
-                });
-
-                
-                NSLog(@"Error");
-                return;
-            }
-            
-            [self parseDictionary:dictionary];
-            
-            
+            [self parseDictionary:JSON];
             [searchResults sortUsingSelector:@selector(compareName:)];
             
-            dispatch_async(dispatch_get_main_queue(), ^{
-                isLoading=NO;
-                [self.tableView reloadData];
-            });
-
-
+            isLoading=NO;
+            [self.tableView reloadData];
             
-        });
+        } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+            
+            [self showNetworkError];
+            isLoading=NO;
+            [self.tableView reloadData];
+            
+        }];
+        
+        operation.acceptableContentTypes=[NSSet setWithObjects:@"application/json",@"text/json",@"text/javascript", nil];
+        
+        [queue addOperation:operation];
+        
         
     }
     
+
+    
+    
+}
+
+-(void)searchBarSearchButtonClicked:(UISearchBar *)searchBar{
+    
+    [self perfomSearch];
+                
 }
 
 
--(NSURL *)urlWithSearchText:(NSString *)searchText
+-(NSURL *)urlWithSearchText:(NSString *)searchText category:(NSInteger)category
 {
+    
+    NSString *categoryName;
+    
+    switch (category){
+            
+        case 0: categoryName=@""; break;
+        case 1: categoryName=@"musicTrack"; break;
+        case 2: categoryName=@"software"; break;
+        case 3: categoryName=@"ebook"; break;
+            
+}
+    
     
     NSString *escapedSearchText=[searchText stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     
     
-    NSString *urlString=[NSString stringWithFormat:@"http://itunes.apple.com/search?term=%@&limit=200",escapedSearchText];
+    NSString *urlString=[NSString stringWithFormat:@"http://itunes.apple.com/search?term=%@&limit=200&entity=%@",escapedSearchText,categoryName];
     
     NSURL *url=[NSURL URLWithString:urlString];
     
     return url;
+    
+}
+
+-(IBAction)segmentedChanged:(UISegmentedControl *)sender
+{
+ 
+    
+    if (searchResults !=nil) {
+        [self perfomSearch];
+    }
     
 }
 @end

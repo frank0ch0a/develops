@@ -57,6 +57,8 @@
 		01DC777A17DCE667008A392C /* AFURLConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 01DC776E17DCE667008A392C /* AFURLConnectionOperation.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		01DC777B17DCE667008A392C /* AFXMLRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 01DC777017DCE667008A392C /* AFXMLRequestOperation.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc -Wno-unused"; }; };
 		01DC777C17DCE667008A392C /* UIImageView+AFNetworking.m in Sources */ = {isa = PBXBuildFile; fileRef = 01DC777217DCE667008A392C /* UIImageView+AFNetworking.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		01DC778017DD1F4B008A392C /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 01DC777E17DD1F4B008A392C /* Default.png */; };
+		01DC778117DD1F4B008A392C /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 01DC777F17DD1F4B008A392C /* Default@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -129,6 +131,8 @@
 		01DC777017DCE667008A392C /* AFXMLRequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFXMLRequestOperation.m; sourceTree = "<group>"; };
 		01DC777117DCE667008A392C /* UIImageView+AFNetworking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+AFNetworking.h"; sourceTree = "<group>"; };
 		01DC777217DCE667008A392C /* UIImageView+AFNetworking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+AFNetworking.m"; sourceTree = "<group>"; };
+		01DC777E17DD1F4B008A392C /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		01DC777F17DD1F4B008A392C /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,6 +213,7 @@
 		01D3651A17D2B9DB006E4A5E /* images */ = {
 			isa = PBXGroup;
 			children = (
+				01DC777D17DD1F4B008A392C /* Launch Images */,
 				01D3655317D2CF06006E4A5E /* Icon */,
 				01D3651B17D2B9F9006E4A5E /* BarTexture.png */,
 				01D3651C17D2B9F9006E4A5E /* BarTexture@2x.png */,
@@ -282,6 +287,15 @@
 				01DC777217DCE667008A392C /* UIImageView+AFNetworking.m */,
 			);
 			path = AFNetworking;
+			sourceTree = "<group>";
+		};
+		01DC777D17DD1F4B008A392C /* Launch Images */ = {
+			isa = PBXGroup;
+			children = (
+				01DC777E17DD1F4B008A392C /* Default.png */,
+				01DC777F17DD1F4B008A392C /* Default@2x.png */,
+			);
+			path = "Launch Images";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -367,6 +381,8 @@
 				01D3656417D2CF06006E4A5E /* Icon@2x.png in Resources */,
 				01D3656517D2CF06006E4A5E /* iTunesArtwork in Resources */,
 				01DC775A17DB8C24008A392C /* LoadingCell.xib in Resources */,
+				01DC778017DD1F4B008A392C /* Default.png in Resources */,
+				01DC778117DD1F4B008A392C /* Default@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
