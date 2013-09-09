@@ -339,6 +339,9 @@ static NSString *const LoadingCellIdentifier=@"LoadingCell";
         
         [queue cancelAllOperations];
         
+        //Clear cache each search
+        
+        
         [[AFImageCache sharedImageCache]removeAllObjects];
         [[NSURLCache sharedURLCache]removeAllCachedResponses];
         
@@ -351,6 +354,7 @@ static NSString *const LoadingCellIdentifier=@"LoadingCell";
         NSURL *url=[self urlWithSearchText:self.searchBar.text category:self.segmentedControl.selectedSegmentIndex];
         
         NSURLRequest *request=[NSURLRequest requestWithURL:url];
+        
         
         
         AFJSONRequestOperation *operation=[AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
